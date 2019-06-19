@@ -25780,6 +25780,8 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+var API_ADDRESS = 'https://spotify-api-wrapper.appspot.com';
+
 var App =
 /*#__PURE__*/
 function (_Component) {
@@ -25799,12 +25801,12 @@ function (_Component) {
     _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(App)).call.apply(_getPrototypeOf2, [this].concat(args)));
 
     _defineProperty(_assertThisInitialized(_this), "state", {
-      artistQuery: ''
+      artistQuery: '',
+      artist: null,
+      tracks: []
     });
 
     _defineProperty(_assertThisInitialized(_this), "updateArtistQuery", function () {
-      console.log('event.target.value', event.target.value);
-
       _this.setState({
         artistQuery: event.target.value
       });
@@ -25818,6 +25820,29 @@ function (_Component) {
 
     _defineProperty(_assertThisInitialized(_this), "searchArtist", function () {
       console.log('this.state', _this.state);
+      fetch("".concat(API_ADDRESS, "/artist/").concat(_this.state.artistQuery)).then(function (response) {
+        return response.json();
+      }).then(function (json) {
+        if (json.artists.total > 0) {
+          var artist = json.artists.items[0];
+
+          _this.setState({
+            artist: artist
+          });
+
+          fetch("".concat(API_ADDRESS, "/artist/").concat(artist.id, "/top-tracks")).then(function (response) {
+            return response.json();
+          }).then(function (json) {
+            return _this.setState({
+              tracks: json.tracks
+            });
+          }).catch(function (error) {
+            return alert(error.message);
+          });
+        }
+      }).catch(function (error) {
+        return alert(error.message);
+      });
     });
 
     return _this;
@@ -25826,6 +25851,7 @@ function (_Component) {
   _createClass(App, [{
     key: "render",
     value: function render() {
+      console.log('this.state', this.state);
       return _react.default.createElement("div", null, _react.default.createElement("h2", null, "Music Master"), _react.default.createElement("input", {
         onChange: this.updateArtistQuery,
         onKeyPress: this.handleKeyPress,
@@ -25956,7 +25982,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52353" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51936" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
